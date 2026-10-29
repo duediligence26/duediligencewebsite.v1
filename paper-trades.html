@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Paper trades - Due Diligence</title>
+<meta name="description" content="End-of-day track record of closed options paper trades from Due Diligence. Simulated, one contract, posted after the close.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F6F6F3}
+a{color:#1D3FAF}a:hover{color:#142C7A}
+html{scroll-behavior:smooth}
+.pt-filters{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 22px}
+.pt-filter{min-height:48px;padding:0 16px;border:1.5px solid #12161C;background:transparent;color:#12161C;font:inherit;font-weight:600;font-size:15px;cursor:pointer}
+.pt-filter[aria-pressed="true"]{background:#12161C;color:#FFFFFF}
+.pt-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0;border-top:1.5px solid #12161C;border-left:1px solid #D9DAD4;margin:0 0 28px}
+.pt-stat{padding:18px 16px 16px;background:#FFFFFF;border-right:1px solid #D9DAD4;border-bottom:1px solid #D9DAD4}
+.pt-stat dt{margin:0 0 6px;font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;color:#4A5059;font-weight:500}
+.pt-stat dd{margin:0;font-family:'IBM Plex Mono',monospace;font-size:28px;font-weight:600;letter-spacing:-0.02em;line-height:1.15}
+.pt-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.pt-table{width:100%;min-width:760px;border-collapse:collapse;font-size:14px;background:#FFFFFF}
+.pt-table th{text-align:left;color:#4A5059;font-size:12px;text-transform:uppercase;letter-spacing:0.05em;font-weight:500;padding:8px;border-bottom:1px solid #12161C}
+.pt-table td{padding:12px 8px;border-bottom:1px solid #E6E6E1;vertical-align:top}
+.pt-table .pt-num,.pt-table .num{text-align:right;font-family:'IBM Plex Mono',monospace;white-space:nowrap}
+.pt-ticker{font-family:'IBM Plex Mono',monospace;font-weight:600}
+.pt-positive{color:#0F6B5C}
+.pt-negative{color:#C2410C}
+.pt-flat{color:#12161C}
+.pt-caption{caption-side:bottom;text-align:left;padding:10px 8px 0;font-size:13px;line-height:1.5;color:#4A5059}
+@media (max-width:640px){
+  .pt-title{font-size:32px !important}
+  .pt-stat dd{font-size:24px}
+}
+</style>
+</head>
+<body>
+<div style="font-family: 'IBM Plex Sans', system-ui, sans-serif; color: #12161C; background: #F6F6F3; min-height: 100vh">
+
+<div role="note" aria-label="Site notice" style="background: #F2C14E; color: #12161C; border-bottom: 2px solid #12161C">
+<div aria-hidden="true" style="height: 8px; background: repeating-linear-gradient(135deg, #12161C 0 12px, #F2C14E 12px 24px)"></div>
+<div style="max-width: 1200px; margin: 0 auto; padding: 12px 24px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; font-size: 15px; line-height: 1.45">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; padding: 4px 8px; background: #12161C; color: #F2C14E">UNDER CONSTRUCTION</span>
+<span>This site is under construction and changing constantly. More importantly, it is a <b style="letter-spacing: 0.04em">PROOF OF CONCEPT</b>.</span>
+</div>
+</div>
+
+<header style="border-bottom: 1px solid #D9DAD4; background: #F6F6F3">
+<nav aria-label="Main" style="max-width: 1200px; margin: 0 auto; padding: 18px 24px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px">
+<a href="index.html" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: #12161C">
+<span aria-hidden="true" style="width: 28px; height: 28px; border: 2px solid #12161C; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-weight: 600; font-size: 13px">DD</span>
+<span style="font-weight: 700; font-size: 17px; letter-spacing: 0.01em">Due Diligence</span>
+</a>
+<div style="display: flex; flex-wrap: wrap; gap: 4px 22px; font-size: 15px">
+<a href="index.html#tools" style="color: #12161C; text-decoration: none; padding: 10px 0">Tools</a>
+<a href="index.html#studies" style="color: #12161C; text-decoration: none; padding: 10px 0">Studies</a>
+<a href="paper-trades.html" aria-current="page" style="color: #12161C; text-decoration: none; padding: 10px 0; font-weight: 600; box-shadow: inset 0 -2px 0 #1D3FAF">Paper trades</a>
+<a href="index.html#commentary" style="color: #12161C; text-decoration: none; padding: 10px 0">Commentary</a>
+<a href="index.html#videos" style="color: #12161C; text-decoration: none; padding: 10px 0">Videos</a>
+<a href="index.html#about" style="color: #12161C; text-decoration: none; padding: 10px 0">About</a>
+</div>
+</nav>
+</header>
+
+<main id="top">
+<section style="max-width: 1200px; margin: 0 auto; padding: 64px 24px 72px">
+<p style="margin: 0 0 10px; font-family: 'IBM Plex Mono', monospace; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: #1D3FAF">Track record · After the close</p>
+<h1 class="pt-title" style="margin: 0 0 12px; font-size: 40px; line-height: 1.1; letter-spacing: -0.01em">Closed options paper trades.</h1>
+<p style="margin: 0 0 28px; font-size: 17px; line-height: 1.6; color: #343A42; max-width: 720px">What the research desk simulated, written down after the closing bell. Newest closed trade first. Open trades stay off this page.</p>
+
+<aside role="note" aria-label="Paper trade disclaimer" style="background: #FFFFFF; border: 1.5px solid #12161C; border-top: 8px solid #F2C14E; padding: 18px 20px; margin: 0 0 28px; max-width: 760px">
+<p style="margin: 0 0 8px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase">Paper trades · Not advice</p>
+<p style="margin: 0; font-size: 16px; line-height: 1.55; color: #12161C">These are paper trades: simulated, not live orders. Each trade is one contract, entered at the ask and exited at the bid. This is not financial advice. Past results do not guarantee future results. The record is posted after the close.</p>
+</aside>
+
+<div id="paper-trades-root">
+<p id="pt-updated" style="margin: 0 0 8px; font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #4A5059">Loading the track record…</p>
+<p id="pt-scope" hidden style="margin: 0 0 16px; font-size: 15px; color: #343A42"></p>
+<p id="pt-error" role="alert" hidden style="margin: 0 0 20px; padding: 16px 18px; background: #FFFFFF; border: 1.5px solid #C2410C; font-size: 16px; line-height: 1.5"></p>
+
+<div id="pt-filters" class="pt-filters" role="group" aria-label="Filter by source">
+<button type="button" class="pt-filter" data-filter="all" aria-pressed="true">All</button>
+<button type="button" class="pt-filter" data-filter="trader copy" aria-pressed="false">Trader copies</button>
+<button type="button" class="pt-filter" data-filter="model" aria-pressed="false">Model picks</button>
+</div>
+
+<dl id="pt-stats" class="pt-stats" aria-live="polite">
+<div class="pt-stat"><dt>Trades</dt><dd id="pt-trades">—</dd></div>
+<div class="pt-stat"><dt>Win–loss</dt><dd id="pt-winloss">—</dd></div>
+<div class="pt-stat"><dt>Win rate</dt><dd id="pt-winrate">—</dd></div>
+<div class="pt-stat"><dt>Total P&amp;L</dt><dd id="pt-pnl" class="pt-flat">—</dd></div>
+<div class="pt-stat"><dt>Average return</dt><dd id="pt-avg" class="pt-flat">—</dd></div>
+</dl>
+
+<p id="pt-empty" hidden style="margin: 0; padding: 22px; background: #FFFFFF; border: 1px solid #D9DAD4; font-size: 16px; line-height: 1.55; color: #343A42"></p>
+
+<div id="pt-table-wrap" class="pt-scroll" tabindex="0" role="region" aria-label="Closed trades" hidden>
+<table class="pt-table">
+<caption class="pt-caption">Newest closed trade first. Premiums are per share. P&amp;L is dollars for one contract.</caption>
+<thead>
+<tr>
+<th scope="col">Date</th>
+<th scope="col">Ticker</th>
+<th scope="col">Contract</th>
+<th scope="col">Source</th>
+<th scope="col" class="num">Entry</th>
+<th scope="col" class="num">Exit</th>
+<th scope="col" class="num">P&amp;L</th>
+<th scope="col" class="num">Return</th>
+<th scope="col">Exit reason</th>
+</tr>
+</thead>
+<tbody id="pt-rows"></tbody>
+</table>
+</div>
+</div>
+<noscript>
+<p style="margin: 16px 0 0; font-size: 16px; line-height: 1.55">This page reads <span style="font-family: 'IBM Plex Mono', monospace">data/paper-trades.json</span> in the browser. With JavaScript off, that public file is still there, but the table will not draw.</p>
+</noscript>
+</section>
+</main>
+
+<footer style="border-top: 1px solid #D9DAD4; background: #ECECE7">
+<div style="max-width: 1200px; margin: 0 auto; padding: 40px 24px; display: flex; flex-wrap: wrap; gap: 24px 48px; justify-content: space-between">
+<div style="flex: 1 1 300px; min-width: 0">
+<p style="margin: 0 0 6px; font-weight: 700">Due Diligence</p>
+<p style="margin: 0 0 6px; font-size: 14px; color: #4A5059">We always do our due diligence.</p>
+<p style="margin: 0; font-size: 14px; color: #4A5059">duediligence.fyi · <a href="mailto:ihavealotofmoneyforthis@duediligence.fyi">ihavealotofmoneyforthis@duediligence.fyi</a></p>
+</div>
+<div style="flex: 2 1 520px; min-width: 0">
+<p style="margin: 0 0 10px; font-size: 14px; line-height: 1.6; color: #12161C"><b>A friendly reminder:</b> these results are simulations, not promises, and trading can lose real money. Practice on a paper account first and take your time.</p>
+<p style="margin: 0; font-size: 12px; line-height: 1.6; color: #4A5059">Hypothetical performance results have many inherent limitations. No representation is made that any account will or is likely to achieve profits or losses similar to those shown. Results are backtests after costs, not live trading, and past results do not predict future results. Futures and options carry substantial risk of loss. The indicators and strategies are for education and research; they are not investment advice.</p>
+</div>
+</div>
+</footer>
+
+</div>
+<script src="paper-trades.js"></script>
+<script>
+PaperTrades.mount(document.getElementById('paper-trades-root'));
+</script>
+</body>
+</html>
