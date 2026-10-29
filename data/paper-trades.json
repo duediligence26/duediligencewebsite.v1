@@ -1,5 +1,5 @@
 {
-  "updated_et": "2026-10-28T23:30:54-04:00",
+  "updated_et": "2026-10-29T17:03:19-04:00",
   "trades": [
     {
       "date": "2026-10-26",
@@ -43,6 +43,50 @@
       "exit": 0.1,
       "pnl_usd": -6.0,
       "return_pct": -37.5,
+      "exit_reason": "stop"
+    },
+    {
+      "date": "2026-10-29",
+      "ticker": "QQQ",
+      "contract": "QQQ 718C 10/29",
+      "source_type": "trader copy",
+      "entry": 1.58,
+      "exit": 0.63,
+      "pnl_usd": -95.0,
+      "return_pct": -60.1,
+      "exit_reason": "stop"
+    },
+    {
+      "date": "2026-10-29",
+      "ticker": "SPY",
+      "contract": "SPY 767P 10/29",
+      "source_type": "trader copy",
+      "entry": 0.44,
+      "exit": 0.87,
+      "pnl_usd": 43.0,
+      "return_pct": 97.7,
+      "exit_reason": "trader_close"
+    },
+    {
+      "date": "2026-10-29",
+      "ticker": "SPY",
+      "contract": "SPY 768P 10/29",
+      "source_type": "trader copy",
+      "entry": 0.82,
+      "exit": 1.34,
+      "pnl_usd": 52.0,
+      "return_pct": 63.4,
+      "exit_reason": "target"
+    },
+    {
+      "date": "2026-10-29",
+      "ticker": "SPY",
+      "contract": "SPY 771C 10/29",
+      "source_type": "trader copy",
+      "entry": 0.65,
+      "exit": 0.24,
+      "pnl_usd": -41.0,
+      "return_pct": -63.1,
       "exit_reason": "stop"
     }
   ]
