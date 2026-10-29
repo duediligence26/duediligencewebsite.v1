@@ -1,4 +1,49 @@
 {
-  "updated_et": null,
-  "trades": []
+  "updated_et": "2026-10-28T23:30:54-04:00",
+  "trades": [
+    {
+      "date": "2026-10-26",
+      "ticker": "AAPL",
+      "contract": "AAPL 345C 10/26",
+      "source_type": "trader copy",
+      "entry": 1.29,
+      "exit": 0.0,
+      "pnl_usd": -129.0,
+      "return_pct": -100.0,
+      "exit_reason": "expiration"
+    },
+    {
+      "date": "2026-10-26",
+      "ticker": "SPY",
+      "contract": "SPY 763P 10/26",
+      "source_type": "trader copy",
+      "entry": 0.17,
+      "exit": 0.0,
+      "pnl_usd": -17.0,
+      "return_pct": -100.0,
+      "exit_reason": "expiration"
+    },
+    {
+      "date": "2026-10-26",
+      "ticker": "SPY",
+      "contract": "SPY 766C 10/26",
+      "source_type": "trader copy",
+      "entry": 0.26,
+      "exit": 0.0,
+      "pnl_usd": -26.0,
+      "return_pct": -100.0,
+      "exit_reason": "expiration"
+    },
+    {
+      "date": "2026-10-26",
+      "ticker": "SPY",
+      "contract": "SPY 767C 10/26",
+      "source_type": "trader copy",
+      "entry": 0.16,
+      "exit": 0.1,
+      "pnl_usd": -6.0,
+      "return_pct": -37.5,
+      "exit_reason": "stop"
+    }
+  ]
 }
