@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Paper trades - Due Diligence</title>
-<meta name="description" content="End-of-day track record of closed options paper trades from Due Diligence. Simulated, one contract, posted after the close.">
+<title>CBC paper trades - Due Diligence</title>
+<meta name="description" content="Paper track record of the MapleStax CBC signal: simulated same-day SPY and QQQ option trades, not real money. Posted after the close.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
 <style>
@@ -28,6 +28,16 @@ html{scroll-behavior:smooth}
 .pt-negative{color:#C2410C}
 .pt-flat{color:#12161C}
 .pt-caption{caption-side:bottom;text-align:left;padding:10px 8px 0;font-size:13px;line-height:1.5;color:#4A5059}
+.cbc-rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin:0 0 28px}
+.cbc-rule{background:#FFFFFF;border:1px solid #D9DAD4;border-top:3px solid #12161C;padding:18px 18px 16px}
+.cbc-rule h3{margin:0 0 8px;font-size:18px;line-height:1.3}
+.cbc-rule p{margin:0;font-size:15px;line-height:1.55;color:#343A42}
+.cbc-versions{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin:0 0 20px}
+.cbc-version h3{margin:0 0 8px;font-size:16px}
+.cbc-version-note{margin:0 0 12px;font-size:14px;line-height:1.5;color:#343A42}
+.cbc-version .pt-stats{margin-bottom:0}
+.cbc-table{min-width:1040px}
+.pt-sub{display:block;margin-top:2px;color:#4A5059;font-size:12px;font-weight:400;letter-spacing:0;text-transform:none;font-family:'IBM Plex Sans',system-ui,sans-serif}
 @media (max-width:640px){
   .pt-title{font-size:32px !important}
   .pt-stat dd{font-size:24px}
@@ -63,9 +73,101 @@ html{scroll-behavior:smooth}
 </header>
 
 <main id="top">
-<section style="max-width: 1200px; margin: 0 auto; padding: 64px 24px 72px">
+<section id="cbc" style="max-width: 1200px; margin: 0 auto; padding: 64px 24px 56px">
+<p style="margin: 0 0 14px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; padding: 4px 8px; background: #12161C; color: #F2C14E">PAPER</span>
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: #1D3FAF">Not real money · After the close</span>
+</p>
+<h1 class="pt-title" style="margin: 0 0 12px; font-size: 40px; line-height: 1.1; letter-spacing: -0.01em">MapleStax CBC paper trades.</h1>
+<p style="margin: 0 0 28px; font-size: 17px; line-height: 1.6; color: #343A42; max-width: 760px">The desk is paper-trading one strategy: the MapleStax CBC signal, a TradingView indicator that flips long or short on the 10-minute chart. Each signal is a same-day (0DTE) option. The paper book trades SPY. QQQ is added starting November 6, 2026. Two versions run side by side on the same signal. These are simulated trades. They are not live orders and not real money.</p>
+
+<div class="cbc-rules">
+<article class="cbc-rule">
+<h3>The fill</h3>
+<p>Both versions are entered at the ask and exited at the bid. A paper trade stays off this page until it is closed. The record is posted after the close. One signal can show up twice, once in each version.</p>
+</article>
+<article class="cbc-rule">
+<h3>1 contract</h3>
+<p>One contract. A stop closes the paper trade at −30%. A profit lock protects an open gain. A target closes it at +100%. An opposite signal flips the paper trade out.</p>
+</article>
+<article class="cbc-rule">
+<h3>4 contract scale-out</h3>
+<p>Four contracts. Sell one at +40%, one at +60%, and one at +100%. The last contract trails. After the first sale, the stop moves to breakeven. Anything still open is out by 3:40 p.m. Eastern. In the table, the exit is the average sale price and P&amp;L is the combined dollars.</p>
+</article>
+</div>
+
+<aside role="note" aria-label="CBC paper trade disclaimer" style="background: #FFFFFF; border: 1.5px solid #12161C; border-top: 8px solid #F2C14E; padding: 18px 20px; margin: 0 0 28px; max-width: 760px">
+<p style="margin: 0 0 8px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase">Paper trades · Not real money</p>
+<p style="margin: 0; font-size: 16px; line-height: 1.55; color: #12161C">Every figure in this section is a simulation. Nothing was sent to a broker. This is not financial advice. Past paper results do not guarantee future results.</p>
+</aside>
+
+<div id="cbc-paper-trades-root">
+<p id="cbc-strategy" style="margin: 0 0 4px; font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #4A5059">MapleStax CBC 10m</p>
+<p id="cbc-updated" style="margin: 0 0 16px; font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #4A5059">Loading the CBC paper record…</p>
+<p id="cbc-error" role="alert" hidden style="margin: 0 0 20px; padding: 16px 18px; background: #FFFFFF; border: 1.5px solid #C2410C; font-size: 16px; line-height: 1.5"></p>
+<p id="cbc-empty" role="status" hidden style="margin: 0 0 20px; padding: 22px; background: #FFFFFF; border: 1px solid #D9DAD4; font-size: 16px; line-height: 1.55; color: #343A42">First CBC trades post after the close.</p>
+
+<div id="cbc-stats" class="cbc-versions">
+<section class="cbc-version" aria-labelledby="cbc-1-heading">
+<h3 id="cbc-1-heading">Paper · 1 contract</h3>
+<p class="cbc-version-note">Stop at −30%, profit lock, target at +100%, flip on the opposite signal.</p>
+<dl class="pt-stats" aria-live="polite" aria-label="1 contract paper summary">
+<div class="pt-stat"><dt>Trades</dt><dd id="cbc-1-trades">—</dd></div>
+<div class="pt-stat"><dt>Win rate</dt><dd id="cbc-1-winrate">—</dd></div>
+<div class="pt-stat"><dt>Total P&amp;L</dt><dd id="cbc-1-pnl" class="pt-flat">—</dd></div>
+<div class="pt-stat"><dt>Average return</dt><dd id="cbc-1-avg" class="pt-flat">—</dd></div>
+</dl>
+</section>
+<section class="cbc-version" aria-labelledby="cbc-4-heading">
+<h3 id="cbc-4-heading">Paper · 4 contract scale-out</h3>
+<p class="cbc-version-note">Sell 1 at +40%, 1 at +60%, and 1 at +100%. The runner trails. Stop moves to breakeven after the first sale. Out by 3:40 p.m. Eastern.</p>
+<dl class="pt-stats" aria-live="polite" aria-label="4 contract paper summary">
+<div class="pt-stat"><dt>Trades</dt><dd id="cbc-4-trades">—</dd></div>
+<div class="pt-stat"><dt>Win rate</dt><dd id="cbc-4-winrate">—</dd></div>
+<div class="pt-stat"><dt>Total P&amp;L</dt><dd id="cbc-4-pnl" class="pt-flat">—</dd></div>
+<div class="pt-stat"><dt>Average return</dt><dd id="cbc-4-avg" class="pt-flat">—</dd></div>
+</dl>
+</section>
+</div>
+
+<div id="cbc-table-wrap" hidden>
+<h2 style="margin: 8px 0 12px; font-size: 22px; line-height: 1.3">Closed paper trades</h2>
+<div class="pt-scroll" tabindex="0" role="region" aria-label="Closed CBC paper trades">
+<table class="pt-table cbc-table">
+<caption class="pt-caption">Newest closed paper trade first. Premiums are per share, with the Eastern time under the price. P&amp;L is simulated dollars, not money in an account. For 4 contracts, exit is the average sale price and P&amp;L is the combined total. Peak may be blank.</caption>
+<thead>
+<tr>
+<th scope="col">Date</th>
+<th scope="col">Symbol</th>
+<th scope="col">Version</th>
+<th scope="col">Side</th>
+<th scope="col">Contract</th>
+<th scope="col" class="num">Entry</th>
+<th scope="col" class="num">Exit</th>
+<th scope="col" class="num">Contracts</th>
+<th scope="col" class="num">P&amp;L</th>
+<th scope="col" class="num">Return</th>
+<th scope="col" class="num">Peak</th>
+<th scope="col">Exit reason</th>
+</tr>
+</thead>
+<tbody id="cbc-rows"></tbody>
+</table>
+</div>
+</div>
+</div>
+<noscript>
+<p style="margin: 16px 0 0; font-size: 16px; line-height: 1.55">This section reads <span style="font-family: 'IBM Plex Mono', monospace">data/cbc-paper-trades.json</span> in the browser. First CBC trades post after the close. With JavaScript off, that public file is still there, but the table will not draw.</p>
+</noscript>
+<p style="margin: 36px 0 0; font-size: 15px; line-height: 1.5"><a href="#earlier-program">Earlier program: X trader alerts (ended Nov 2026)</a></p>
+</section>
+
+<section id="earlier-program" style="border-top: 1px solid #D9DAD4">
+<div style="max-width: 1200px; margin: 0 auto; padding: 56px 24px 72px">
+<h2 style="margin: 0 0 12px; font-size: 32px; line-height: 1.15; letter-spacing: -0.01em">Earlier program: X trader alerts (ended Nov 2026)</h2>
+<p style="margin: 0 0 28px; font-size: 17px; line-height: 1.6; color: #343A42; max-width: 720px">This paper program ended in November 2026, when the desk switched to MapleStax CBC above. The closed trades below are that earlier record.</p>
 <p style="margin: 0 0 10px; font-family: 'IBM Plex Mono', monospace; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: #1D3FAF">Track record · After the close</p>
-<h1 class="pt-title" style="margin: 0 0 12px; font-size: 40px; line-height: 1.1; letter-spacing: -0.01em">Closed options paper trades.</h1>
+<h3 style="margin: 0 0 12px; font-size: 28px; line-height: 1.15; letter-spacing: -0.01em">Closed options paper trades.</h3>
 <p style="margin: 0 0 28px; font-size: 17px; line-height: 1.6; color: #343A42; max-width: 720px">What the research desk simulated, written down after the closing bell. Newest closed trade first. Open trades stay off this page.</p>
 
 <aside role="note" aria-label="Paper trade disclaimer" style="background: #FFFFFF; border: 1.5px solid #12161C; border-top: 8px solid #F2C14E; padding: 18px 20px; margin: 0 0 28px; max-width: 760px">
@@ -117,6 +219,7 @@ html{scroll-behavior:smooth}
 <noscript>
 <p style="margin: 16px 0 0; font-size: 16px; line-height: 1.55">This page reads <span style="font-family: 'IBM Plex Mono', monospace">data/paper-trades.json</span> in the browser. With JavaScript off, that public file is still there, but the table will not draw.</p>
 </noscript>
+</div>
 </section>
 </main>
 
@@ -137,6 +240,7 @@ html{scroll-behavior:smooth}
 </div>
 <script src="paper-trades.js"></script>
 <script>
+PaperTrades.mountCbc(document.getElementById('cbc-paper-trades-root'));
 PaperTrades.mount(document.getElementById('paper-trades-root'));
 </script>
 </body>
