@@ -5,9 +5,11 @@ const path = require('node:path');
 
 const {
   parsePaperTrades,
+  parseCbcPaperTrades,
   selectTrades,
   summarizeTrades,
   viewModel,
+  cbcViewModel,
 } = require('./paper-trades.js');
 
 function trade(overrides) {
@@ -32,14 +34,14 @@ test('empty track record parses', () => {
   assert.deepEqual(parsed.trades, []);
 });
 
-test('committed file is an empty track record', () => {
+test('committed earlier-program file matches the schema', () => {
   const file = path.join(__dirname, 'data', 'paper-trades.json');
   assert.equal(fs.existsSync(file), true, 'data/paper-trades.json should be committed');
   const raw = JSON.parse(fs.readFileSync(file, 'utf8'));
   const parsed = parsePaperTrades(raw);
   assert.equal(parsed.ok, true);
-  assert.equal(parsed.updatedEt, null);
-  assert.deepEqual(parsed.trades, []);
+  assert.ok(Array.isArray(parsed.trades));
+  assert.ok(parsed.trades.length > 0);
 });
 
 test('rejects unknown keys so handles and balances cannot render', () => {
@@ -278,6 +280,275 @@ test('paper trades page carries the disclaimer, nav, and data hook', () => {
   assert.match(html, /past results do not guarantee future results/i);
   assert.match(html, /after the close/i);
   assert.match(html, /overflow-x:\s*auto/);
+});
+
+function cbcTrade(overrides) {
+  const row = {
+    date: '2026-11-05',
+    symbol: 'SPY',
+    version: '1 contract',
+    direction: 'LONG',
+    contract: 'SPY 744C 11/5',
+    entry_time_et: '11:28',
+    entry: 4.12,
+    exit_time_et: '11:43',
+    exit: 2.88,
+    contracts: 1,
+    pnl_usd: -124,
+    return_pct: -30.1,
+    exit_reason: 'stop',
+    peak_pct: 12,
+    ...overrides,
+  };
+  if (!overrides || !Object.prototype.hasOwnProperty.call(overrides, 'contracts')) {
+    row.contracts = row.version === '4 contract' ? 4 : 1;
+  }
+  return row;
+}
+
+function cbcFile(trades, updated) {
+  return {
+    updated_et: updated === undefined ? null : updated,
+    strategy: 'MapleStax CBC 10m',
+    trades,
+  };
+}
+
+test('empty CBC record parses', () => {
+  const parsed = parseCbcPaperTrades(cbcFile([]));
+  assert.equal(parsed.ok, true);
+  assert.equal(parsed.updatedEt, null);
+  assert.equal(parsed.strategy, 'MapleStax CBC 10m');
+  assert.deepEqual(parsed.trades, []);
+});
+
+test('committed CBC file is an empty paper record', () => {
+  const file = path.join(__dirname, 'data', 'cbc-paper-trades.json');
+  assert.equal(fs.existsSync(file), true, 'data/cbc-paper-trades.json should be committed');
+  const raw = JSON.parse(fs.readFileSync(file, 'utf8'));
+  assert.deepEqual(raw, {
+    updated_et: null,
+    strategy: 'MapleStax CBC 10m',
+    trades: [],
+  });
+  const parsed = parseCbcPaperTrades(raw);
+  assert.equal(parsed.ok, true);
+  assert.deepEqual(parsed.trades, []);
+});
+
+test('CBC and earlier schemas are not interchangeable', () => {
+  const earlier = JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'paper-trades.json'), 'utf8'));
+  const cbc = JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'cbc-paper-trades.json'), 'utf8'));
+  assert.equal(parseCbcPaperTrades(earlier).ok, false);
+  assert.equal(parsePaperTrades(cbc).ok, false);
+});
+
+test('CBC rejects handles, balances, links, and the earlier timestamp shape', () => {
+  const withHandle = parseCbcPaperTrades(cbcFile([cbcTrade({ handle: '@someone' })]));
+  assert.equal(withHandle.ok, false);
+  assert.match(withHandle.error, /handle/);
+
+  const withAccount = parseCbcPaperTrades({
+    updated_et: null,
+    strategy: 'MapleStax CBC 10m',
+    account: '123456',
+    trades: [],
+  });
+  assert.equal(withAccount.ok, false);
+  assert.match(withAccount.error, /account/);
+
+  const withLink = parseCbcPaperTrades(cbcFile([cbcTrade({ contract: 'SPY 744C https://signals.example/a' })]));
+  assert.equal(withLink.ok, false);
+  assert.match(withLink.error, /link/);
+
+  const iso = parseCbcPaperTrades(cbcFile([], '2026-11-05T16:30:00-05:00'));
+  assert.equal(iso.ok, false);
+  assert.match(iso.error, /updated_et/);
+});
+
+test('CBC rejects a bad version, direction, exit reason, contract count, and peak', () => {
+  assert.equal(parseCbcPaperTrades(cbcFile([cbcTrade({ version: '2 contract' })])).ok, false);
+  assert.equal(parseCbcPaperTrades(cbcFile([cbcTrade({ direction: 'long' })])).ok, false);
+  assert.equal(parseCbcPaperTrades(cbcFile([cbcTrade({ exit_reason: 'expiration' })])).ok, false);
+  assert.equal(parseCbcPaperTrades(cbcFile([cbcTrade({ version: '4 contract', contracts: 1 })])).ok, false);
+  assert.equal(parseCbcPaperTrades(cbcFile([cbcTrade({ contracts: 4 })])).ok, false);
+  assert.equal(parseCbcPaperTrades(cbcFile([cbcTrade({ peak_pct: '12' })])).ok, false);
+  assert.equal(parseCbcPaperTrades(cbcFile([cbcTrade({ entry_time_et: '11:28 AM' })])).ok, false);
+  const missingPeak = cbcTrade();
+  delete missingPeak.peak_pct;
+  assert.match(parseCbcPaperTrades(cbcFile([missingPeak])).error, /peak_pct/);
+});
+
+test('CBC accepts a null peak and the clock timestamp', () => {
+  const parsed = parseCbcPaperTrades(cbcFile([
+    cbcTrade({ version: '4 contract', peak_pct: null, exit_reason: 'scale-out' }),
+  ], '2026-11-05 16:30 ET'));
+  assert.equal(parsed.ok, true);
+  assert.equal(parsed.updatedEt, '2026-11-05 16:30 ET');
+  assert.equal(parsed.trades[0].contracts, 4);
+  assert.equal(parsed.trades[0].peak_pct, null);
+});
+
+test('CBC view model for an empty file names the first-trade message', () => {
+  const model = cbcViewModel(cbcFile([]));
+  assert.equal(model.ok, true);
+  assert.equal(model.strategy, 'MapleStax CBC 10m');
+  assert.equal(model.updatedLabel, null);
+  assert.equal(model.emptyMessage, 'First CBC trades post after the close.');
+  assert.equal(model.rows.length, 0);
+  for (const side of [model.one, model.four]) {
+    assert.equal(side.tradesLabel, '0');
+    assert.equal(side.winRateLabel, '—');
+    assert.equal(side.totalPnlLabel, '$0.00');
+    assert.equal(side.totalPnlSign, 'flat');
+    assert.equal(side.averageReturnLabel, '—');
+    assert.equal(side.averageReturnSign, 'flat');
+  }
+});
+
+test('CBC view model splits versions and formats a closed paper trade', () => {
+  const model = cbcViewModel(cbcFile([
+    cbcTrade(),
+    cbcTrade({
+      date: '2026-11-04',
+      symbol: 'QQQ',
+      version: '4 contract',
+      direction: 'SHORT',
+      contract: 'QQQ 600P 11/4',
+      entry_time_et: '09:05',
+      entry: 1.5,
+      exit_time_et: '15:40',
+      exit: 1.2,
+      pnl_usd: -120,
+      return_pct: -20,
+      exit_reason: 'time exit',
+      peak_pct: null,
+    }),
+    cbcTrade({
+      version: '4 contract',
+      contract: 'SPY 744C 11/5',
+      entry_time_et: '10:15',
+      entry: 2,
+      exit_time_et: '15:20',
+      exit: 3.2,
+      pnl_usd: 480,
+      return_pct: 60,
+      exit_reason: 'scale-out',
+      peak_pct: 110,
+    }),
+    cbcTrade({
+      version: '4 contract',
+      contract: 'SPY 750C 11/5',
+      entry_time_et: '12:00',
+      entry: 1,
+      exit_time_et: '15:20',
+      exit: 1,
+      pnl_usd: 0,
+      return_pct: 0,
+      exit_reason: 'flip',
+      peak_pct: 0,
+    }),
+  ], '2026-11-05 16:30 ET'));
+
+  assert.equal(model.ok, true);
+  assert.equal(model.updatedLabel, 'Updated Nov 5, 2026, 4:30 PM ET');
+  assert.equal(model.emptyMessage, null);
+  assert.deepEqual(model.rows.map((row) => row.contract), [
+    'SPY 750C 11/5',
+    'SPY 744C 11/5',
+    'SPY 744C 11/5',
+    'QQQ 600P 11/4',
+  ]);
+
+  const stopped = model.rows[2];
+  assert.equal(stopped.dateLabel, 'Nov 5, 2026');
+  assert.equal(stopped.symbol, 'SPY');
+  assert.equal(stopped.versionLabel, '1 contract');
+  assert.equal(stopped.directionLabel, 'Long');
+  assert.equal(stopped.entryTimeLabel, '11:28 AM ET');
+  assert.equal(stopped.entryLabel, '$4.12');
+  assert.equal(stopped.exitTimeLabel, '11:43 AM ET');
+  assert.equal(stopped.exitLabel, '$2.88');
+  assert.equal(stopped.contractsLabel, '1');
+  assert.equal(stopped.pnlLabel, '−$124.00');
+  assert.equal(stopped.pnlSign, 'negative');
+  assert.equal(stopped.returnLabel, '−30.10%');
+  assert.equal(stopped.returnSign, 'negative');
+  assert.equal(stopped.peakLabel, '+12.00%');
+  assert.equal(stopped.peakSign, 'positive');
+  assert.equal(stopped.exitReasonLabel, 'Stop');
+
+  const scaled = model.rows[1];
+  assert.equal(scaled.versionLabel, '4 contract');
+  assert.equal(scaled.contractsLabel, '4');
+  assert.equal(scaled.exitLabel, '$3.20');
+  assert.equal(scaled.pnlLabel, '+$480.00');
+  assert.equal(scaled.pnlSign, 'positive');
+  assert.equal(scaled.returnLabel, '+60.00%');
+  assert.equal(scaled.exitReasonLabel, 'Scale-out');
+  assert.equal(scaled.peakLabel, '+110.00%');
+
+  const timed = model.rows[3];
+  assert.equal(timed.symbol, 'QQQ');
+  assert.equal(timed.directionLabel, 'Short');
+  assert.equal(timed.entryTimeLabel, '9:05 AM ET');
+  assert.equal(timed.exitTimeLabel, '3:40 PM ET');
+  assert.equal(timed.exitReasonLabel, 'Time exit');
+  assert.equal(timed.peakLabel, '—');
+  assert.equal(timed.peakSign, 'flat');
+
+  assert.equal(model.rows[0].exitTimeLabel, '3:20 PM ET');
+  assert.equal(model.rows[0].entryTimeLabel, '12:00 PM ET');
+  assert.equal(model.rows[0].exitReasonLabel, 'Flip');
+  assert.equal(model.rows[0].peakLabel, '0.00%');
+
+  assert.equal(model.one.tradesLabel, '1');
+  assert.equal(model.one.winRateLabel, '0.0%');
+  assert.equal(model.one.totalPnlLabel, '−$124.00');
+  assert.equal(model.one.totalPnlSign, 'negative');
+  assert.equal(model.one.averageReturnLabel, '−30.10%');
+  assert.equal(model.one.averageReturnSign, 'negative');
+
+  assert.equal(model.four.tradesLabel, '3');
+  assert.equal(model.four.winRateLabel, '33.3%');
+  assert.equal(model.four.totalPnlLabel, '+$360.00');
+  assert.equal(model.four.totalPnlSign, 'positive');
+  assert.equal(model.four.averageReturnLabel, '+13.33%');
+  assert.equal(model.four.averageReturnSign, 'positive');
+});
+
+test('paper trades page features CBC and keeps the earlier program', () => {
+  const html = fs.readFileSync(path.join(__dirname, 'paper-trades.html'), 'utf8');
+  assert.match(html, /id="cbc-paper-trades-root"/);
+  assert.match(html, /data\/cbc-paper-trades\.json/);
+  assert.match(html, /MapleStax CBC/);
+  assert.match(html, /First CBC trades post after the close/);
+  assert.match(html, /Earlier program: X trader alerts \(ended Nov 2026\)/);
+  assert.match(html, /id="paper-trades-root"/);
+  assert.match(html, /mountCbc/);
+  assert.match(html, /not real money/i);
+  assert.match(html, /0DTE/);
+  assert.match(html, /3:40/);
+  assert.match(html, /profit lock/i);
+  assert.match(html, /\+100%/);
+  assert.match(html, /\+40%/);
+  assert.match(html, /November 6, 2026/);
+  assert.match(html, /entered at the ask/i);
+  assert.match(html, /exited at the bid/i);
+  assert.doesNotMatch(html, /x\.com|twitter\.com|tradingview\.com/i);
+});
+
+test('README documents the CBC file beside the earlier schema', () => {
+  const readme = fs.readFileSync(path.join(__dirname, 'README.md'), 'utf8');
+  assert.match(readme, /data\/cbc-paper-trades\.json/);
+  assert.match(readme, /MapleStax CBC 10m/);
+  assert.match(readme, /YYYY-MM-DD HH:MM ET/);
+  assert.match(readme, /4 contract/);
+  assert.match(readme, /peak_pct/);
+  assert.match(readme, /First CBC trades post after the close/);
+  for (const field of ['symbol', 'direction', 'entry_time_et', 'contracts', 'scale-out']) {
+    assert.ok(readme.includes(field), `README should mention ${field}`);
+  }
 });
 
 test('README documents the schema and the daily write', () => {
